@@ -4,6 +4,7 @@ import uuid
 
 class DBLogger(dblog.DBLogger):
     def start(self, cfg):
+        self.cfg = cfg
         if cfg.has_option('database_irc', 'port'):
             port = int(cfg.get('database_irc', 'port'))
         else:
@@ -35,6 +36,8 @@ class DBLogger(dblog.DBLogger):
         self.connection.join(self.channel)
 
     def write(self, session, message):
+        if not self.connection.running:
+            self.start(self.cfg)
         self.connection.msg(self.channel, "[%s] %s" % (session, message))
 
     def createSession(self, peerIP, peerPort, hostIP, hostPort):
